@@ -1,10 +1,8 @@
-from typing import List
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import PydanticOutputParser
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from ..core.config import settings
 import json
+import httpx
 
 
 class GeneratedQA(BaseModel):
@@ -18,30 +16,33 @@ class GeneratedQAs(BaseModel):
 
 class LLMService:
     def __init__(self):
-        # Initialize LLM based on provider
         if settings.LLM_PROVIDER.lower() == "groq":
-            self.llm = ChatOpenAI(
-                model=settings.GROQ_MODEL,
-                temperature=0.7,
-                api_key=settings.GROQ_API_KEY,
-                base_url="https://api.groq.com/openai/v1",
-            )
-        else:  # Default to OpenAI
-            self.llm = ChatOpenAI(
-                model=settings.OPENAI_MODEL,
-                temperature=0.7,
-                api_key=settings.OPENAI_API_KEY,
-            )
-
-        # Initialize embeddings (still use OpenAI as fallback)
-        if settings.OPENAI_API_KEY:
-            self.embeddings = OpenAIEmbeddings(
-                model=settings.OPENAI_EMBEDDING_MODEL,
-                api_key=settings.OPENAI_API_KEY,
-            )
+            self.api_key = settings.GROQ_API_KEY
+            self.model = settings.GROQ_MODEL
+            self.base_url = "https://api.groq.com/openai/v1"
         else:
-            # Fallback: simple mock embeddings for demo
-            self.embeddings = None
+            self.api_key = settings.OPENAI_API_KEY
+            self.model = settings.OPENAI_MODEL
+            self.base_url = "https://api.openai.com/v1"
+
+    async def _call_api(self, messages: list) -> str:
+        """调用OpenAI兼容API"""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                f"{self.base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": 0.7,
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"]
 
     async def generate_qa(self, topic: str, difficulty: str = "intermediate", num_questions: int = 1) -> List[GeneratedQA]:
         """
@@ -54,53 +55,57 @@ class LLMService:
         }
         difficulty_cn = difficulty_map.get(difficulty, "中级")
 
-        parser = PydanticOutputParser(pydantic_object=GeneratedQAs)
-
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", """你是一位资深的绘画技法教育专家，专门帮助美术留学生复习绘画知识。
+        system_prompt = f"""你是一位资深的绘画技法教育专家，专门帮助美术留学生复习绘画知识。
 
 请根据用户提供的主题生成{num_questions}个绘画技法相关的问答对。
 
 要求：
-1. 问题应该针对性强，能够测试对{difficulty}绘画技法的理解
+1. 问题应该针对性强，能够测试对{difficulty_cn}绘画技法的理解
 2. 答案应该准确、详细，包含必要的绘画术语和理论解释
 3. 问题应该具有一定的实用性，能够帮助学生在实际绘画中应用
 4. 答案应该用中文回答
 
-请按照以下JSON格式输出：
-{format_instructions}"""),
-            ("user", "主题：{topic}")
-        ])
+请严格按照以下JSON格式输出，不要输出其他内容：
+{{"qas": [{{"question": "问题内容", "answer": "答案内容"}}]}}"""
 
-        chain = prompt | self.llm | parser
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"主题：{topic}"}
+        ]
 
         try:
-            result = await chain.ainvoke({
-                "topic": topic,
-                "difficulty": difficulty_cn,
-                "num_questions": num_questions,
-                "format_instructions": parser.get_format_instructions()
-            })
-            return result.qas
+            result_text = await self._call_api(messages)
+            # 尝试解析JSON
+            result_text = result_text.strip()
+            # 去掉可能的markdown代码块标记
+            if result_text.startswith("```"):
+                result_text = result_text.split("\n", 1)[1] if "\n" in result_text else result_text[3:]
+            if result_text.endswith("```"):
+                result_text = result_text[:-3]
+            result_text = result_text.strip()
+            if result_text.startswith("json"):
+                result_text = result_text[4:].strip()
+
+            data = json.loads(result_text)
+            qas = []
+            for qa in data.get("qas", []):
+                qas.append(GeneratedQA(question=qa["question"], answer=qa["answer"]))
+            return qas if qas else await self._generate_qa_fallback(topic, difficulty, num_questions)
         except Exception as e:
-            # Fallback to simple text parsing if JSON parsing fails
             return await self._generate_qa_fallback(topic, difficulty, num_questions)
 
     async def _generate_qa_fallback(self, topic: str, difficulty: str, num_questions: int) -> List[GeneratedQA]:
         """
         Fallback method for QA generation
         """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", f"请基于主题'{topic}'生成{num_questions}个绘画技法相关的问答对。答案应该详细准确。"),
-            ("user", f"主题：{topic}")
-        ])
+        messages = [
+            {"role": "system", "content": f"请基于主题生成{num_questions}个绘画技法问答对，用中文回答。"},
+            {"role": "user", "content": f"主题：{topic}"}
+        ]
 
-        chain = prompt | self.llm
-        result = await chain.ainvoke({})
-
-        # Simple parsing fallback
-        lines = result.content.split('\n')
+        result_text = await self._call_api(messages)
         qas = []
+        lines = result_text.split('\n')
         current_q = None
         current_a = []
 
@@ -122,24 +127,7 @@ class LLMService:
         if not qas:
             qas.append(GeneratedQA(
                 question=f"关于{topic}的核心知识点是什么？",
-                answer=result.content
+                answer=result_text
             ))
 
         return qas
-
-    def get_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """
-        获取文本的向量嵌入
-        """
-        if self.embeddings:
-            return self.embeddings.embed_documents(texts)
-        else:
-            # Fallback: return simple hash-based embeddings for demo
-            import hashlib
-            embeddings = []
-            for text in texts:
-                # Create a simple 384-dim embedding from hash
-                hash_val = int(hashlib.md5(text.encode()).hexdigest(), 16)
-                embedding = [(hash_val >> i) & 1 for i in range(384)]
-                embeddings.append(embedding)
-            return embeddings
