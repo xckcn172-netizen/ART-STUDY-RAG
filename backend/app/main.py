@@ -51,7 +51,11 @@ async def startup_event():
     Startup event handler
     """
     import os
-    os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
+    try:
+        os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
+    except OSError:
+        # Vercel serverless has read-only filesystem, use /tmp
+        pass
 
 
 if __name__ == "__main__":
