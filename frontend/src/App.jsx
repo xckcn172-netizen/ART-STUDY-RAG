@@ -43,13 +43,13 @@ export default function App() {
   return (
     <div className="h-screen overflow-hidden bg-[#09090b] text-white flex">
       {/* ambient */}
-      <div className="fixed inset-0 pointer-events-none"><div className="absolute -top-48 -left-24 w-[500px] h-[500px] bg-violet-600/8 rounded-full blur-[120px]"/><div className="absolute -bottom-32 right-[20%] w-[400px] h-[400px] bg-blue-600/6 rounded-full blur-[100px]"/></div>
+      <div className="fixed inset-0 pointer-events-none"><div className="absolute -top-48 -left-24 w-[500px] h-[500px] bg-violet-600/8 rounded-full blur-[120px]"/><div className="absolute -bottom-32 right-[20%] w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[100px]"/></div>
 
       {/* ── Sidebar ── */}
       <aside className="relative z-10 w-52 shrink-0 border-r border-white/[0.06] flex flex-col">
         <div className="p-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center"><Svg path={I.palette} className="w-3.5 h-3.5 text-white"/></div>
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-violet-400 flex items-center justify-center shadow-lg shadow-violet-500/20"><Svg path={I.palette} className="w-3.5 h-3.5 text-white"/></div>
             <div><p className="text-xs font-bold">美术生RAG</p><p className="text-[9px] text-zinc-600">AI Study</p></div>
           </div>
         </div>
@@ -60,28 +60,25 @@ export default function App() {
             {key:'stats',label:'学习统计',icon:I.stats},
           ].map(t=>(
             <button key={t.key} onClick={()=>setActiveTab(t.key)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all mb-0.5 ${activeTab===t.key?'bg-white/[0.08] text-white':'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]'}`}>
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all mb-0.5 ${activeTab===t.key?'bg-violet-500/15 text-violet-300':'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]'}`}>
               <Svg path={t.icon} className="w-3.5 h-3.5"/>{t.label}
             </button>
           ))}
         </nav>
         <div className="p-3 border-t border-white/[0.06] space-y-2">
-          <div className="flex items-center gap-1.5"><Svg path={I.brain} className="w-3 h-3 text-violet-400"/><span className="text-[10px] text-zinc-600">RAG知识库</span></div>
-          <div className="flex items-center gap-1.5"><Svg path={I.sparkle} className="w-3 h-3 text-blue-400"/><span className="text-[10px] text-zinc-600">AI驱动</span></div>
-          <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"/><span className="text-[10px] text-zinc-600">在线</span></div>
+          <div className="flex items-center gap-1.5"><Svg path={I.brain} className="w-3 h-3 text-violet-400/60"/><span className="text-[10px] text-zinc-600">RAG知识库</span></div>
+          <div className="flex items-center gap-1.5"><Svg path={I.sparkle} className="w-3 h-3 text-violet-400/60"/><span className="text-[10px] text-zinc-600">AI驱动</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-violet-500"/><span className="text-[10px] text-zinc-600">在线</span></div>
         </div>
       </aside>
 
       {/* ── Main ── */}
       <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
-        {/* topbar */}
         <div className="h-10 shrink-0 border-b border-white/[0.06] flex items-center px-5 gap-3">
           <span className="text-xs font-semibold text-zinc-300">{activeTab==='cards'?'复习卡片':activeTab==='quiz'?'测验模式':'学习统计'}</span>
           <span className="text-[10px] text-zinc-700">|</span>
           <span className="text-[10px] text-zinc-500">{activeTab==='cards'?'生成与管理':activeTab==='quiz'?'知识检测':'数据分析'}</span>
         </div>
-
-        {/* content - LOCKED HEIGHT */}
         <div className="flex-1 overflow-hidden p-4">
           {activeTab==='cards' && <CardsTab formData={formData} setFormData={setFormData} cards={cards} loading={loading} handleGenerate={handleGenerate}/>}
           {activeTab==='quiz' && <QuizView/>}
@@ -96,11 +93,10 @@ export default function App() {
 function CardsTab({formData,setFormData,cards,loading,handleGenerate}) {
   return (
     <div className="h-full flex gap-4">
-      {/* Left panel - form */}
       <div className="w-[340px] shrink-0 flex flex-col gap-3">
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center"><Svg path={I.plus} className="w-3 h-3 text-violet-400"/></div>
+            <div className="w-6 h-6 rounded-md bg-violet-500/15 flex items-center justify-center"><Svg path={I.plus} className="w-3 h-3 text-violet-400"/></div>
             <span className="text-xs font-semibold text-zinc-200">生成卡片</span>
           </div>
           <div className="space-y-2.5">
@@ -119,12 +115,11 @@ function CardsTab({formData,setFormData,cards,loading,handleGenerate}) {
               </select>
             </div>
             <button onClick={handleGenerate} disabled={loading}
-              className="w-full py-1.5 bg-gradient-to-r from-violet-600 to-blue-600 text-white text-xs font-medium rounded-lg hover:from-violet-500 hover:to-blue-500 disabled:from-zinc-700 disabled:to-zinc-700 transition-all">
+              className="w-full py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-500 disabled:bg-zinc-700 transition-all">
               {loading?<span className="flex items-center justify-center gap-1.5"><Spin className="w-3 h-3"/>生成中...</span>:'生成卡片'}
             </button>
           </div>
         </div>
-        {/* topics */}
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3 flex-1">
           <p className="text-[9px] text-zinc-600 uppercase tracking-widest mb-2">支持主题</p>
           <div className="grid grid-cols-2 gap-1.5">
@@ -136,8 +131,6 @@ function CardsTab({formData,setFormData,cards,loading,handleGenerate}) {
           </div>
         </div>
       </div>
-
-      {/* Right panel - cards */}
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] text-zinc-600 uppercase tracking-widest">复习卡片 ({cards.length})</span>
@@ -158,11 +151,11 @@ function CardsTab({formData,setFormData,cards,loading,handleGenerate}) {
 // ── Card ─────────────────────────────────────────────────────
 function CardItem({card,index}) {
   const [flipped,setFlipped]=useState(false);
-  const dm={beginner:{l:'初级',c:'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'},intermediate:{l:'中级',c:'bg-amber-500/10 text-amber-400 border-amber-500/20'},advanced:{l:'高级',c:'bg-rose-500/10 text-rose-400 border-rose-500/20'}};
+  const dm={beginner:{l:'初级',c:'bg-violet-500/10 text-violet-400 border-violet-500/20'},intermediate:{l:'中级',c:'bg-violet-500/15 text-violet-300 border-violet-500/30'},advanced:{l:'高级',c:'bg-violet-500/20 text-violet-200 border-violet-400/30'}};
   const d=dm[card.difficulty]||dm.intermediate;
   return (
     <div className="group cursor-pointer" onClick={()=>setFlipped(!flipped)}>
-      <div className={`bg-white/[0.02] border rounded-xl transition-all hover:bg-white/[0.04] hover:-translate-y-px hover:shadow-lg hover:shadow-violet-500/5 ${flipped?'border-violet-500/20 bg-white/[0.04]':'border-white/[0.06]'}`}>
+      <div className={`bg-white/[0.02] border rounded-xl transition-all hover:bg-white/[0.04] hover:-translate-y-px hover:shadow-lg hover:shadow-violet-500/5 ${flipped?'border-violet-500/25 bg-white/[0.04]':'border-white/[0.06]'}`}>
         <div className="p-3">
           <div className="flex justify-between items-center mb-2">
             <span className="text-[9px] text-zinc-600 uppercase tracking-wider">{card.topic}</span>
@@ -211,15 +204,14 @@ function QuizView() {
     try{setLoading(true);const r=await quizApi.submitQuiz({session_id:currentQuiz.id,answers:userAnswers});setQuizResult(r.data);}catch{alert('提交失败');}finally{setLoading(false);}
   };
 
-  // start
   if(!cards.length&&!currentQuiz) return (
     <div className="h-full grid grid-cols-2 gap-4">
       <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl flex flex-col items-center justify-center">
-        <Svg path={I.quiz} className="w-8 h-8 text-blue-400 mb-3"/>
+        <Svg path={I.quiz} className="w-8 h-8 text-violet-400 mb-3"/>
         <p className="text-sm font-semibold text-zinc-200 mb-1">开始测验</p>
         <p className="text-[11px] text-zinc-500 mb-5">随机抽取5张卡片检测掌握度</p>
         <button onClick={startQuiz} disabled={loading}
-          className="px-6 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-xs font-medium rounded-lg hover:from-blue-500 hover:to-cyan-500 disabled:from-zinc-700 disabled:to-zinc-700 transition-all">
+          className="px-6 py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-500 disabled:bg-zinc-700 transition-all">
           {loading?<span className="flex items-center gap-1.5"><Spin className="w-3 h-3"/>加载中</span>:'开始测验'}
         </button>
       </div>
@@ -234,31 +226,30 @@ function QuizView() {
     </div>
   );
 
-  // result
   if(quizResult) return (
     <div className="h-full flex flex-col gap-3">
       <div className="grid grid-cols-[180px_1fr] gap-3">
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3 flex flex-col items-center justify-center">
-          <span className="text-2xl font-black bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">{quizResult.score.toFixed(1)}</span>
+          <span className="text-2xl font-black text-violet-400">{quizResult.score.toFixed(1)}</span>
           <span className="text-[9px] text-zinc-500 mt-0.5">平均分</span>
         </div>
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 flex items-center justify-between">
           <div className="flex gap-5">
-            <div><p className="text-base font-bold text-emerald-400">{quizResult.answers.filter(a=>a.is_correct).length}</p><p className="text-[9px] text-zinc-500">正确</p></div>
-            <div><p className="text-base font-bold text-rose-400">{quizResult.answers.filter(a=>!a.is_correct).length}</p><p className="text-[9px] text-zinc-500">待提高</p></div>
+            <div><p className="text-base font-bold text-violet-400">{quizResult.answers.filter(a=>a.is_correct).length}</p><p className="text-[9px] text-zinc-500">正确</p></div>
+            <div><p className="text-base font-bold text-zinc-400">{quizResult.answers.filter(a=>!a.is_correct).length}</p><p className="text-[9px] text-zinc-500">待提高</p></div>
             <div><p className="text-base font-bold text-zinc-300">{quizResult.answers.length}</p><p className="text-[9px] text-zinc-500">总题数</p></div>
           </div>
-          <button onClick={startQuiz} className="px-4 py-1.5 bg-gradient-to-r from-violet-600 to-blue-600 text-white text-xs rounded-lg hover:from-violet-500 hover:to-blue-500 transition-all">再来一次</button>
+          <button onClick={startQuiz} className="px-4 py-1.5 bg-violet-600 text-white text-xs rounded-lg hover:bg-violet-500 transition-all">再来一次</button>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-2 content-start">
         {quizResult.answers.map((a,i)=>{
-          const c=cards.find(x=>x.id===a.card_id);const ok=a.is_correct;
+          const c=cards.find(x=>x.id===a.card_id);
           return (
-            <div key={i} className={`bg-white/[0.02] rounded-xl p-3 border ${ok?'border-emerald-500/15':'border-rose-500/15'}`}>
+            <div key={i} className="bg-white/[0.02] rounded-xl p-3 border border-white/[0.06]">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <span className={`text-[9px] font-bold px-1 py-px rounded border ${ok?'bg-emerald-500/10 text-emerald-400 border-emerald-500/20':'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>#{i+1}</span>
-                <span className={`text-[10px] font-semibold ${ok?'text-emerald-400':'text-rose-400'}`}>{a.score.toFixed(1)}分</span>
+                <span className="text-[9px] font-bold px-1 py-px rounded border bg-violet-500/10 text-violet-400 border-violet-500/20">#{i+1}</span>
+                <span className="text-[10px] font-semibold text-violet-400">{a.score.toFixed(1)}分</span>
               </div>
               <div className="bg-white/[0.03] rounded px-2.5 py-1.5 mb-1.5 border border-white/[0.04]"><p className="text-[11px] text-zinc-300">{c?.question}</p></div>
               <div className="space-y-1">
@@ -272,12 +263,11 @@ function QuizView() {
     </div>
   );
 
-  // answering
   return (
     <div className="h-full grid grid-cols-2 gap-4">
       <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-3 shrink-0">
-          <div className="flex items-center gap-2"><Svg path={I.edit} className="w-3.5 h-3.5 text-blue-400"/><span className="text-xs font-semibold text-zinc-200">答题中</span></div>
+          <div className="flex items-center gap-2"><Svg path={I.edit} className="w-3.5 h-3.5 text-violet-400"/><span className="text-xs font-semibold text-zinc-200">答题中</span></div>
           <span className="text-[9px] text-zinc-600 bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/[0.06]">{userAnswers.length}题</span>
         </div>
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
@@ -286,17 +276,17 @@ function QuizView() {
             return (
               <div key={i} className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
                 <div className="flex items-start gap-2 mb-2">
-                  <span className="shrink-0 w-4 h-4 rounded bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-[9px] font-bold text-blue-400">{i+1}</span>
+                  <span className="shrink-0 w-4 h-4 rounded bg-violet-500/15 flex items-center justify-center text-[9px] font-bold text-violet-400">{i+1}</span>
                   <p className="text-[11px] text-zinc-300 leading-relaxed">{c?.question}</p>
                 </div>
                 <textarea value={a.user_answer} onChange={e=>{const x=[...userAnswers];x[i].user_answer=e.target.value;setUserAnswers(x);}}
-                  placeholder="输入答案..." className="w-full px-2.5 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-[11px] text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/40 transition-all resize-none" rows={2}/>
+                  placeholder="输入答案..." className="w-full px-2.5 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-[11px] text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/40 transition-all resize-none" rows={2}/>
               </div>
             );
           })}
         </div>
         <button onClick={handleSubmit} disabled={loading}
-          className="mt-3 w-full py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-xs font-medium rounded-lg hover:from-blue-500 hover:to-cyan-500 disabled:from-zinc-700 disabled:to-zinc-700 transition-all shrink-0">
+          className="mt-3 w-full py-2 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-500 disabled:bg-zinc-700 transition-all shrink-0">
           {loading?<span className="flex items-center justify-center gap-1.5"><Spin className="w-3 h-3"/>提交中</span>:'提交答案'}
         </button>
       </div>
@@ -304,11 +294,11 @@ function QuizView() {
         <p className="text-[9px] text-zinc-600 uppercase tracking-widest mb-3">答题提示</p>
         <div className="space-y-2">
           {[{t:'用自己语言描述，避免照搬'},{t:'包含专业术语会加分'},{t:'答案越详细得分越高'},{t:'先构思再动笔'}].map((tip,i)=>(
-            <div key={i} className="flex items-start gap-1.5"><div className="w-1 h-1 rounded-full bg-blue-500/50 mt-1.5 shrink-0"/><p className="text-[11px] text-zinc-500">{tip.t}</p></div>
+            <div key={i} className="flex items-start gap-1.5"><div className="w-1 h-1 rounded-full bg-violet-500/50 mt-1.5 shrink-0"/><p className="text-[11px] text-zinc-500">{tip.t}</p></div>
           ))}
         </div>
         <div className="mt-4 bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
-          <div className="flex items-center gap-1.5 mb-1"><Svg path={I.lightbulb} className="w-3 h-3 text-amber-400/50"/><span className="text-[10px] text-zinc-400">评分机制</span></div>
+          <div className="flex items-center gap-1.5 mb-1"><Svg path={I.lightbulb} className="w-3 h-3 text-violet-400/60"/><span className="text-[10px] text-zinc-400">评分机制</span></div>
           <p className="text-[10px] text-zinc-600 leading-relaxed">AI对比你的回答与标准答案的语义相似度，综合评估准确度、完整性和专业性，给出0-10分。</p>
         </div>
       </div>
@@ -323,7 +313,7 @@ function StatsView() {
   const loadStats=async()=>{try{setLoading(true);const r=await quizApi.getStats();setStats(r.data);}catch(e){console.error(e);}finally{setLoading(false);}};
   useState(()=>{loadStats();});
 
-  if(loading) return <div className="h-full flex items-center justify-center"><Spin className="w-6 h-6 text-zinc-600"/></div>;
+  if(loading) return <div className="h-full flex items-center justify-center"><Spin className="w-6 h-6 text-violet-400"/></div>;
 
   if(!stats) return (
     <div className="h-full grid grid-cols-2 gap-4">
@@ -333,7 +323,7 @@ function StatsView() {
       <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
         <p className="text-[9px] text-zinc-600 uppercase tracking-widest mb-3">获取数据步骤</p>
         {[{n:'01',t:'生成复习卡片'},{n:'02',t:'完成一次测验'},{n:'03',t:'查看统计数据'}].map((s,i)=>(
-          <div key={i} className="flex gap-2 mb-2"><span className="text-[10px] font-bold text-emerald-400/50 w-5">{s.n}</span><p className="text-[11px] text-zinc-500">{s.t}</p></div>
+          <div key={i} className="flex gap-2 mb-2"><span className="text-[10px] font-bold text-violet-400/50 w-5">{s.n}</span><p className="text-[11px] text-zinc-500">{s.t}</p></div>
         ))}
       </div>
     </div>
@@ -341,26 +331,25 @@ function StatsView() {
 
   return (
     <div className="h-full grid grid-cols-2 gap-4">
-      {/* left */}
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-3 gap-2">
           {[
-            {l:'完成测验',v:stats.total_quizzes,g:'from-violet-500/20 to-purple-500/20',c:'text-violet-400',ic:I.book},
-            {l:'平均分',v:stats.average_score.toFixed(1),g:'from-emerald-500/20 to-teal-500/20',c:'text-emerald-400',ic:I.stats},
-            {l:'已学卡片',v:stats.total_cards_learned,g:'from-blue-500/20 to-cyan-500/20',c:'text-blue-400',ic:I.cards},
+            {l:'完成测验',v:stats.total_quizzes,ic:I.book},
+            {l:'平均分',v:stats.average_score.toFixed(1),ic:I.stats},
+            {l:'已学卡片',v:stats.total_cards_learned,ic:I.cards},
           ].map((s,i)=>(
             <div key={i} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3 text-center group hover:bg-white/[0.04] transition-all">
-              <div className={`w-7 h-7 mx-auto rounded-lg bg-gradient-to-br ${s.g} flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform`}>
-                <Svg path={s.ic} className={`w-3 h-3 ${s.c}`}/>
+              <div className="w-7 h-7 mx-auto rounded-lg bg-violet-500/15 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+                <Svg path={s.ic} className="w-3 h-3 text-violet-400"/>
               </div>
-              <p className={`text-lg font-black ${s.c}`}>{s.v}</p>
+              <p className="text-lg font-black text-violet-400">{s.v}</p>
               <p className="text-[9px] text-zinc-500">{s.l}</p>
             </div>
           ))}
         </div>
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 flex-1 flex flex-col">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2"><Svg path={I.stats} className="w-3.5 h-3.5 text-emerald-400"/><span className="text-xs font-semibold text-zinc-200">成绩趋势</span></div>
+            <div className="flex items-center gap-2"><Svg path={I.stats} className="w-3.5 h-3.5 text-violet-400"/><span className="text-xs font-semibold text-zinc-200">成绩趋势</span></div>
             <button onClick={loadStats} className="text-[9px] text-zinc-500 hover:text-zinc-300 flex items-center gap-1"><Svg path={I.refresh} className="w-2.5 h-2.5"/>刷新</button>
           </div>
           {stats.recent_performance.length>0?(
@@ -368,29 +357,27 @@ function StatsView() {
               {stats.recent_performance.map((s,i)=>(
                 <div key={i} className="flex flex-col items-center flex-1">
                   <span className="text-[9px] font-bold text-zinc-500 mb-1">{s.toFixed(0)}</span>
-                  <div className="w-full rounded bg-gradient-to-t from-violet-600/50 to-blue-500/50 hover:from-violet-500/70 hover:to-blue-400/70 transition-all" style={{height:`${Math.max(s,5)}%`}}/>
+                  <div className="w-full rounded bg-gradient-to-t from-violet-600/50 to-violet-400/50 hover:from-violet-500/70 hover:to-violet-300/70 transition-all" style={{height:`${Math.max(s,5)}%`}}/>
                 </div>
               ))}
             </div>
           ):<div className="flex-1 flex items-center justify-center"><p className="text-[10px] text-zinc-600">暂无记录</p></div>}
         </div>
       </div>
-
-      {/* right */}
       <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 flex flex-col">
         <p className="text-[9px] text-zinc-600 uppercase tracking-widest mb-3">学习洞察</p>
         <div className="space-y-2.5 flex-1">
           <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
-            <div className="flex items-center gap-1.5 mb-1"><Svg path={I.stats} className="w-3 h-3 text-emerald-400"/><span className="text-[10px] font-medium text-zinc-300">表现评估</span></div>
+            <div className="flex items-center gap-1.5 mb-1"><Svg path={I.stats} className="w-3 h-3 text-violet-400"/><span className="text-[10px] font-medium text-zinc-300">表现评估</span></div>
             <p className="text-[10px] text-zinc-500 leading-relaxed">{stats.average_score>=7?'表现优秀，继续保持！':stats.average_score>=4?'中等水平，建议加强薄弱点。':'需要更多练习，从初级开始。'}</p>
           </div>
           <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
             <div className="flex items-center gap-1.5 mb-2"><Svg path={I.book} className="w-3 h-3 text-violet-400"/><span className="text-[10px] font-medium text-zinc-300">学习进度</span></div>
             <div className="flex justify-between mb-1"><span className="text-[9px] text-zinc-500">已掌握</span><span className="text-[9px] text-zinc-400">{stats.total_cards_learned}张</span></div>
-            <div className="h-1 bg-white/[0.04] rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-violet-500 to-blue-500 rounded-full" style={{width:`${Math.min(100,stats.total_cards_learned*5)}%`}}/></div>
+            <div className="h-1 bg-white/[0.04] rounded-full overflow-hidden"><div className="h-full bg-violet-500 rounded-full" style={{width:`${Math.min(100,stats.total_cards_learned*5)}%`}}/></div>
           </div>
           <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
-            <div className="flex items-center gap-1.5 mb-1"><Svg path={I.sparkle} className="w-3 h-3 text-blue-400"/><span className="text-[10px] font-medium text-zinc-300">建议</span></div>
+            <div className="flex items-center gap-1.5 mb-1"><Svg path={I.sparkle} className="w-3 h-3 text-violet-400"/><span className="text-[10px] font-medium text-zinc-300">建议</span></div>
             <p className="text-[10px] text-zinc-500 leading-relaxed">每天15-20分钟复习效果最佳，坚持卡片复习和测验。</p>
           </div>
         </div>
